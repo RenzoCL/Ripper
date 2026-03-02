@@ -1,177 +1,576 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrar — Ripper</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --red: #e50914; --red-glow: rgba(229,9,20,0.4);
-            --bg:  #080808; --surface: rgba(12,12,12,0.88);
-            --border: rgba(255,255,255,0.07);
-            --muted: #bdbdbd;
-            --font-display: 'Bebas Neue', sans-serif;
-            --font-body:    'Outfit', sans-serif;
-        }
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; font-family: var(--font-body); background: var(--bg); color: #fff; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrar — Ripper</title>
 
-        body::after {
-            content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.3;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
-        .page {
-            min-height: 100vh; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; padding: 32px 20px;
-            background-image: radial-gradient(ellipse at 20% 20%, rgba(229,9,20,0.05), transparent 50%);
-        }
+  <style>
+    :root{
+      --red:#e50914;
+      --red-2:#ff1e2d;
+      --black:#050505;
+      --black-soft:#0b0b0b;
+      --card:rgba(15,15,15,.72);
+      --card-border:rgba(255,255,255,.09);
+      --muted:#b8b8b8;
+      --text:#f5f5f5;
+      --ok:#25D366;
+      --radius:16px;
+      --shadow:0 18px 60px rgba(0,0,0,.65);
+      --font-display:'Bebas Neue', sans-serif;
+      --font-body:'Outfit', sans-serif;
+    }
 
-        .box {
-            width: 100%; max-width: 380px;
-            background: var(--surface); border-radius: 14px;
-            padding: 30px 28px; border: 1px solid var(--border);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
-        }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:var(--font-body);
+      color:var(--text);
+      background:var(--black);
+      overflow-x:hidden;
+    }
 
-        .brand {
-            font-family: var(--font-display); font-size: 2.6rem;
-            letter-spacing: 0.2em; color: var(--red);
-            text-shadow: 0 0 28px var(--red-glow);
-            display: block; margin-bottom: 4px;
-        }
-        .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 22px; }
+    /* Fondo cinematográfico */
+    .bg{
+      position:fixed;
+      inset:0;
+      z-index:-3;
+      background:
+        radial-gradient(1200px 700px at 85% 10%, rgba(229,9,20,.18), transparent 62%),
+        radial-gradient(900px 500px at 10% 90%, rgba(229,9,20,.12), transparent 58%),
+        linear-gradient(115deg, rgba(0,0,0,.88), rgba(0,0,0,.55) 45%, rgba(0,0,0,.88)),
+        url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=2000&q=80") center/cover no-repeat;
+      filter:saturate(1.05) contrast(1.06);
+      transform:scale(1.03);
+      animation:slowZoom 24s ease-in-out infinite alternate;
+    }
+    .bg::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(to top, rgba(0,0,0,.9), rgba(0,0,0,.45) 45%, rgba(0,0,0,.9));
+    }
+    .bg::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      opacity:.22;
+      pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      mix-blend-mode:screen;
+    }
 
-        .error-text {
-            display: none; color: #ffb3b3;
-            background: rgba(255,77,77,0.08); padding: 9px 12px;
-            border-radius: 7px; font-size: 0.83rem; margin-bottom: 12px;
-        }
+    .vignette{
+      position:fixed;
+      inset:0;
+      z-index:-2;
+      pointer-events:none;
+      background:radial-gradient(circle at center, transparent 38%, rgba(0,0,0,.68) 100%);
+    }
 
-        .field       { margin-bottom: 12px; }
-        .field label { display: block; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #ccc; margin-bottom: 6px; }
-        .login-input {
-            width: 100%; padding: 11px 13px; border-radius: 7px;
-            border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.4);
-            color: #fff; font-family: var(--font-body); font-size: 0.9rem; outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .login-input:focus { border-color: rgba(229,9,20,0.6); box-shadow: 0 0 0 3px rgba(229,9,20,0.1); }
+    .page{
+      min-height:100vh;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      width:min(1200px, 94%);
+      margin:0 auto;
+      padding:22px 0 18px;
+    }
 
-        .btn-login {
-            width: 100%; margin-top: 14px; padding: 12px;
-            background: var(--red); border: none; color: white;
-            border-radius: 7px; font-weight: 700; font-family: var(--font-body);
-            font-size: 0.9rem; cursor: pointer; letter-spacing: 0.06em;
-            transition: filter 0.2s, transform 0.1s;
-        }
-        .btn-login:hover  { filter: brightness(1.1); }
-        .btn-login:active { transform: scale(0.98); }
-        .btn-login:disabled { opacity: 0.7; cursor: not-allowed; }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      opacity:0;
+      transform:translateY(-12px);
+      animation:fadeUp .7s ease .08s forwards;
+    }
 
-        .wa-section { margin-top: 18px; text-align: center; }
-        .wa-text     { color: #888; font-size: 0.82rem; margin-bottom: 10px; }
-        .btn-whatsapp {
-            display: inline-flex; align-items: center; gap: 7px;
-            background: #25D366; color: white; padding: 9px 16px;
-            border-radius: 20px; text-decoration: none; font-weight: 700; font-size: 0.85rem;
-        }
+    .brand{
+      font-family:var(--font-display);
+      font-size:3rem;
+      letter-spacing:.18em;
+      color:var(--red);
+      text-shadow:0 0 28px rgba(229,9,20,.4);
+      user-select:none;
+      position:relative;
+    }
 
-        footer { margin-top: 20px; color: #555; font-size: 0.8rem; letter-spacing: 0.08em; }
+    .brand::after{
+      content:"";
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:3px;
+      height:7px;
+      background:linear-gradient(90deg, transparent, rgba(229,9,20,.45), transparent);
+      filter:blur(7px);
+      opacity:.6;
+    }
 
-        @media (max-width: 420px) {
-            .box { padding: 22px 18px; }
-            .brand { font-size: 2.2rem; }
-        }
-    </style>
+    .badge{
+      border:1px solid rgba(255,255,255,.22);
+      color:#e9e9e9;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:.78rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      backdrop-filter:blur(6px);
+      background:rgba(0,0,0,.28);
+    }
+
+    .content{
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:36px;
+      align-items:center;
+      padding:20px 0;
+    }
+
+    .hero h1{
+      font-size:clamp(2.2rem, 5vw, 4.6rem);
+      line-height:.95;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.01em;
+      max-width:16ch;
+      opacity:0;
+      transform:translateY(20px);
+      animation:fadeUp .85s ease .2s forwards;
+    }
+    .hero h1 .accent{color:var(--red)}
+    .hero p{
+      margin-top:16px;
+      color:#d0d0d0;
+      font-size:1.03rem;
+      max-width:48ch;
+      line-height:1.55;
+      opacity:0;
+      transform:translateY(16px);
+      animation:fadeUp .85s ease .33s forwards;
+    }
+
+    .hero-points{
+      margin-top:20px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      opacity:0;
+      transform:translateY(14px);
+      animation:fadeUp .85s ease .42s forwards;
+    }
+    .chip{
+      font-size:.78rem;
+      color:#f0f0f0;
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:999px;
+      padding:8px 12px;
+      background:rgba(255,255,255,.04);
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .box{
+      position:relative;
+      width:100%;
+      max-width:430px;
+      margin-left:auto;
+      background:var(--card);
+      border:1px solid var(--card-border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+      padding:28px 26px 22px;
+      overflow:hidden;
+      isolation:isolate;
+      opacity:0;
+      transform:translateY(20px) scale(.985);
+      animation:fadeUp .85s cubic-bezier(.2,.8,.2,1) .2s forwards;
+    }
+
+    .box::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius:inherit;
+      background:linear-gradient(140deg, rgba(229,9,20,.35), transparent 35%, transparent 65%, rgba(255,255,255,.12));
+      z-index:-1;
+      opacity:.45;
+    }
+
+    .box::after{
+      content:"";
+      position:absolute;
+      inset:-140% -25%;
+      background:conic-gradient(from 180deg at 50% 50%, rgba(255,255,255,0), rgba(229,9,20,.22), rgba(255,255,255,0) 40%);
+      animation:sweep 7s linear infinite;
+      opacity:.35;
+      z-index:-2;
+    }
+
+    .signin-title{
+      font-size:1.9rem;
+      font-weight:700;
+      margin-bottom:4px;
+    }
+    .subtitle{
+      color:var(--muted);
+      font-size:.92rem;
+      margin-bottom:16px;
+    }
+
+    .error-text{
+      display:none;
+      margin-bottom:12px;
+      color:#ffd8d8;
+      background:rgba(255,77,77,.12);
+      border:1px solid rgba(255,113,113,.35);
+      padding:10px 12px;
+      border-radius:10px;
+      font-size:.84rem;
+    }
+
+    .field{margin-bottom:11px}
+    .field label{
+      display:block;
+      margin-bottom:7px;
+      font-size:.72rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#d5d5d5;
+      font-weight:500;
+    }
+
+    .input-wrap{position:relative}
+    .login-input{
+      width:100%;
+      height:48px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:10px;
+      background:rgba(0,0,0,.45);
+      color:#fff;
+      padding:0 42px 0 13px;
+      font-size:.93rem;
+      outline:none;
+      transition:.2s border-color, .2s box-shadow, .2s background;
+    }
+    .login-input::placeholder{color:#9c9c9c}
+    .login-input:focus{
+      border-color:rgba(229,9,20,.75);
+      box-shadow:0 0 0 4px rgba(229,9,20,.14);
+      background:rgba(0,0,0,.6);
+    }
+
+    .toggle-pass{
+      position:absolute;
+      right:10px;
+      top:50%;
+      transform:translateY(-50%);
+      background:transparent;
+      border:none;
+      color:#c9c9c9;
+      cursor:pointer;
+      width:28px;
+      height:28px;
+      border-radius:7px;
+    }
+    .toggle-pass:hover{background:rgba(255,255,255,.08)}
+
+    .meta{
+      margin-top:8px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:.83rem;
+      color:var(--muted);
+      gap:10px;
+    }
+    .remember{display:flex;align-items:center;gap:8px}
+    .remember input{accent-color:var(--red)}
+    .meta a{color:#d8d8d8;text-decoration:none}
+    .meta a:hover{text-decoration:underline}
+
+    .btn-login{
+      width:100%;
+      margin-top:14px;
+      height:48px;
+      border:none;
+      border-radius:10px;
+      background:linear-gradient(180deg, var(--red-2), var(--red));
+      color:#fff;
+      font-size:.93rem;
+      font-weight:800;
+      letter-spacing:.08em;
+      cursor:pointer;
+      transition:filter .2s, transform .08s, box-shadow .2s;
+      box-shadow:0 10px 30px rgba(229,9,20,.35);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .btn-login::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:-30%;
+      width:30%;
+      height:100%;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.32), transparent);
+      transform:skewX(-20deg);
+      transition:left .5s ease;
+    }
+    .btn-login:hover{filter:brightness(1.08)}
+    .btn-login:hover::before{left:120%}
+    .btn-login:active{transform:translateY(1px)}
+    .btn-login:disabled{opacity:.7;cursor:not-allowed}
+
+    .wa-section{
+      margin-top:16px;
+      text-align:center;
+      border-top:1px solid rgba(255,255,255,.09);
+      padding-top:14px;
+    }
+    .wa-text{
+      color:#a4a4a4;
+      font-size:.82rem;
+      margin-bottom:10px;
+    }
+    .btn-whatsapp{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      text-decoration:none;
+      background:var(--ok);
+      color:#fff;
+      font-weight:700;
+      font-size:.86rem;
+      padding:10px 16px;
+      border-radius:999px;
+      box-shadow:0 10px 24px rgba(37,211,102,.3);
+      transition:transform .15s ease, filter .2s ease;
+    }
+    .btn-whatsapp:hover{transform:translateY(-1px);filter:brightness(1.05)}
+
+    .live-line{
+      margin-top:14px;
+      font-size:.7rem;
+      color:#8d8d8d;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--red);
+      box-shadow:0 0 14px rgba(229,9,20,.8);
+      animation:pulse 1.5s ease-in-out infinite;
+    }
+
+    footer{
+      text-align:center;
+      color:#696969;
+      font-size:.79rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      padding-top:6px;
+    }
+
+    @media (max-width: 980px){
+      .content{grid-template-columns:1fr;gap:22px}
+      .hero{max-width:680px}
+      .box{margin:0;max-width:560px}
+    }
+    @media (max-width: 520px){
+      .page{width:min(94%, 460px);padding-top:12px}
+      .topbar .badge{display:none}
+      .brand{font-size:2.3rem}
+      .hero h1{font-size:2rem}
+      .hero p{font-size:.95rem}
+      .box{padding:22px 18px}
+    }
+
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(20px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    @keyframes pulse{
+      0%,100%{transform:scale(1);opacity:1}
+      50%{transform:scale(1.3);opacity:.72}
+    }
+
+    @keyframes slowZoom{
+      from{transform:scale(1.03)}
+      to{transform:scale(1.08)}
+    }
+
+    @keyframes sweep{
+      from{transform:rotate(0deg)}
+      to{transform:rotate(360deg)}
+    }
+  </style>
 </head>
 <body>
-    <div class="page">
-        <div class="box">
-            <span class="brand">RIPPER</span>
-            <p class="subtitle">Partituras, audios y más</p>
+  <div class="bg" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
 
-            <div id="error-msg" class="error-text"></div>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">RIPPER</div>
+      <div class="badge">Acceso Premium</div>
+    </header>
 
-            <div class="field">
-                <label>Correo electrónico</label>
-                <input type="email" id="email" placeholder="ejemplo@correo.com" class="login-input">
-            </div>
-            <div class="field">
-                <label>Contraseña</label>
-                <input type="password" id="password" placeholder="••••••••" class="login-input">
-            </div>
-
-            <button id="btnLogin" class="btn-login">ENTRAR</button>
-
-            <div class="wa-section">
-                <p class="wa-text">¿No tienes cuenta? Contáctame</p>
-                <a href="https://wa.me/51933287274" target="_blank" class="btn-whatsapp">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
-                </a>
-            </div>
+    <main class="content">
+      <section class="hero" aria-label="Presentación">
+        <h1>Tu contenido, <span class="accent">sin límites</span>.</h1>
+        <p>Accede a tus partituras, audios y recursos exclusivos con una interfaz potente, elegante y rápida.</p>
+        <div class="hero-points">
+          <span class="chip">Streaming Style</span>
+          <span class="chip">Acceso seguro</span>
+          <span class="chip">Alta calidad</span>
         </div>
-        <footer>HECHO POR RENZO CHAVARRIA</footer>
-    </div>
+        <div class="live-line"><span class="dot"></span>Acceso en tiempo real</div>
+      </section>
 
-    <script type="module">
-        import { auth, db } from "./firebase.js";
-        import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { reclamarSesion } from "./js/seguridad.js";
+      <section class="box" aria-label="Formulario de acceso">
+        <h2 class="signin-title">Iniciar sesión</h2>
+        <p class="subtitle">Ingresa para continuar en Ripper Lab</p>
 
-        const btn = document.getElementById("btnLogin");
-        const err = document.getElementById("error-msg");
+        <div id="error-msg" class="error-text"></div>
 
-        // Si ya tiene sesión activa, ir a home
-        onAuthStateChanged(auth, async (user) => { 
-            if (user) {
-                // Antes de mandarlo a home, nos aseguramos de que este 
-                // navegador sea el "dueño" actual de la sesión.
-                try {
-                    await reclamarSesion(db, user.uid);
-                    window.location.replace("home.html");
-                } catch (e) {
-                    console.error("Error al reclamar sesión automática:", e);
-                    // Si hay error (ej. reglas de Firestore), igual lo mandamos
-                    window.location.replace("home.html");
-                }
-            }
-        });
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="email">Correo electrónico</label>
+            <div class="input-wrap">
+              <input type="email" id="email" class="login-input" placeholder="ejemplo@correo.com" autocomplete="email" required />
+            </div>
+          </div>
 
-        async function doLogin() {
-            const email = document.getElementById("email").value.trim();
-            const pass  = document.getElementById("password").value;
-            if (!email || !pass) return;
+          <div class="field">
+            <label for="password">Contraseña</label>
+            <div class="input-wrap">
+              <input type="password" id="password" class="login-input" placeholder="••••••••" autocomplete="current-password" required />
+              <button type="button" class="toggle-pass" id="togglePass" aria-label="Mostrar contraseña">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
 
-            btn.textContent = "VERIFICANDO...";
-            btn.disabled = true;
-            err.style.display = "none";
+          <div class="meta">
+            <label class="remember">
+              <input type="checkbox" id="remember" />
+              <span>Recuérdame</span>
+            </label>
+            <a href="#">¿Problemas para entrar?</a>
+          </div>
 
-            try {
-                // 1. Autenticar
-                const cred = await signInWithEmailAndPassword(auth, email, pass);
+          <button id="btnLogin" class="btn-login" type="submit">ENTRAR</button>
+        </form>
 
-                // 2. RECLAMAR SESIÓN — esto expulsa a cualquier otro dispositivo
-                //    que esté usando esta cuenta en ese momento
-                await reclamarSesion(db, cred.user.uid);
+        <div class="wa-section">
+          <p class="wa-text">¿No tienes cuenta? Contáctame</p>
+          <a href="https://wa.me/51933287274" target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+          </a>
+        </div>
+      </section>
+    </main>
 
-                // 3. Ir a home
-                window.location.replace("home.html");
+    <footer>Hecho por Renzo Chavarria</footer>
+  </div>
 
-            } catch (e) {
-                btn.textContent = "ENTRAR";
-                btn.disabled = false;
-                err.textContent = "Acceso denegado. Verifica tus datos.";
-                err.style.display = "block";
-            }
-        }
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { reclamarSesion } from "./js/seguridad.js";
 
-        btn.onclick = doLogin;
-        document.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
-    </script>
+    const form = document.getElementById("loginForm");
+    const btn = document.getElementById("btnLogin");
+    const err = document.getElementById("error-msg");
+    const passInput = document.getElementById("password");
+    const togglePass = document.getElementById("togglePass");
+    const remember = document.getElementById("remember");
+
+    const authErrors = {
+      "auth/invalid-credential": "Correo o contraseña incorrectos.",
+      "auth/user-not-found": "No existe una cuenta con ese correo.",
+      "auth/wrong-password": "Correo o contraseña incorrectos.",
+      "auth/too-many-requests": "Demasiados intentos. Intenta más tarde.",
+      "auth/invalid-email": "El formato del correo no es válido."
+    };
+
+    function showError(message) {
+      err.textContent = message;
+      err.style.display = "block";
+    }
+
+    function resetError() {
+      err.style.display = "none";
+      err.textContent = "";
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      try {
+        await reclamarSesion(db, user.uid);
+      } catch (e) {
+        console.error("Error al reclamar sesión automática:", e);
+      } finally {
+        window.location.replace("home.html");
+      }
+    });
+
+    async function doLogin() {
+      const email = document.getElementById("email").value.trim();
+      const pass = passInput.value;
+
+      if (!email || !pass) {
+        showError("Completa correo y contraseña.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "VERIFICANDO...";
+      resetError();
+
+      try {
+        await setPersistence(auth, remember.checked ? browserLocalPersistence : browserSessionPersistence);
+        const cred = await signInWithEmailAndPassword(auth, email, pass);
+        await reclamarSesion(db, cred.user.uid);
+        window.location.replace("home.html");
+      } catch (e) {
+        console.error(e);
+        showError(authErrors[e.code] || "Acceso denegado. Verifica tus datos.");
+        btn.disabled = false;
+        btn.textContent = "ENTRAR";
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await doLogin();
+    });
+
+    togglePass.addEventListener("click", () => {
+      const hidden = passInput.type === "password";
+      passInput.type = hidden ? "text" : "password";
+      togglePass.innerHTML = hidden
+        ? '<i class="fa-regular fa-eye-slash"></i>'
+        : '<i class="fa-regular fa-eye"></i>';
+      togglePass.setAttribute("aria-label", hidden ? "Ocultar contraseña" : "Mostrar contraseña");
+    });
+  </script>
 </body>
 </html>

@@ -4,144 +4,420 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel — Ripper</title>
-    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .admin-layout {
-            max-width: 1100px; margin: 0 auto;
-            padding: calc(var(--header-height) + 24px) 20px 60px;
-            animation: fadeUp 0.4s ease both;
+        :root{
+            --red:#e50914;
+            --red-2:#ff2634;
+            --bg:#070707;
+            --text:#f4f4f4;
+            --muted:#b8b8b8;
+            --line:rgba(255,255,255,.1);
+            --surface:rgba(17,17,17,.82);
+            --surface-2:rgba(12,12,12,.86);
+            --ok:#6ddf8a;
+            --warn:#ffbf4d;
+            --info:#74b7f5;
         }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 
-        /* ── SECTION TITLE ── */
-        .section-label {
-            font-family: var(--font-display); font-size: 1.5rem;
-            letter-spacing: 0.08em; color: #fff; margin-bottom: 18px;
-        }
-        .section-label span { color: var(--red); }
+        *{box-sizing:border-box;margin:0;padding:0}
 
-        /* ── FORM ── */
-        .form-card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 12px; padding: 24px; margin-bottom: 36px;
+        body{
+            font-family:'Outfit',sans-serif;
+            color:var(--text);
+            background:var(--bg);
+            min-height:100vh;
+            overflow-x:hidden;
         }
-        .form-title {
-            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em;
-            text-transform: uppercase; color: var(--muted); margin-bottom: 18px;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .form-grid .full { grid-column: 1 / -1; }
 
-        .field { display: flex; flex-direction: column; gap: 5px; }
-        .field label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-        .field input, .field select {
-            padding: 10px 13px; border-radius: 7px;
-            border: 1px solid var(--border2); background: var(--surface2);
-            color: white; font-family: var(--font-body); font-size: 0.9rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            outline: none;
+        body::before{
+            content:"";
+            position:fixed;
+            inset:0;
+            z-index:-3;
+            background:
+                radial-gradient(1200px 680px at 84% 6%, rgba(229,9,20,.2), transparent 60%),
+                linear-gradient(115deg, rgba(0,0,0,.9), rgba(0,0,0,.58) 48%, rgba(0,0,0,.9)),
+                url('https://images.unsplash.com/photo-1461784180009-21121b2f204c?auto=format&fit=crop&w=2200&q=80') center/cover no-repeat;
+            transform:scale(1.05);
+            animation:slowZoom 24s ease-in-out infinite alternate;
         }
-        .field input:focus, .field select:focus {
-            border-color: rgba(229,9,20,0.55);
-            box-shadow: 0 0 0 3px rgba(229,9,20,0.08);
-        }
-        .field select option { background: #1a1a1a; }
 
-        .form-actions { display: flex; gap: 10px; margin-top: 18px; align-items: center; flex-wrap: wrap; }
+        body::after{
+            content:"";
+            position:fixed;
+            inset:0;
+            z-index:-2;
+            background:radial-gradient(circle at center, transparent 38%, rgba(0,0,0,.76) 100%);
+            pointer-events:none;
+        }
 
-        .btn-save {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 11px 22px; background: var(--red); border: none; color: white;
-            border-radius: 7px; font-family: var(--font-body); font-weight: 700;
-            font-size: 0.88rem; cursor: pointer; transition: filter 0.2s, transform 0.1s;
+        .site-header{
+            position:sticky;
+            top:0;
+            z-index:20;
+            width:min(1260px,94%);
+            margin:0 auto;
+            padding:18px 0 12px;
+            background:linear-gradient(to bottom, rgba(0,0,0,.65), rgba(0,0,0,0));
+            backdrop-filter:blur(8px);
         }
-        .btn-save:hover  { filter: brightness(1.1); }
-        .btn-save:active { transform: scale(0.98); }
 
-        .btn-cancel {
-            display: none; padding: 11px 18px;
-            background: transparent; border: 1px solid var(--border2); color: var(--muted);
-            border-radius: 7px; font-family: var(--font-body); font-size: 0.85rem; cursor: pointer;
-            transition: color 0.2s, border-color 0.2s;
+        .header-inner{
+            display:grid;
+            grid-template-columns:1fr auto 1fr;
+            align-items:center;
+            gap:12px;
         }
-        .btn-cancel:hover { color: white; border-color: rgba(255,255,255,0.25); }
 
-        #status-msg {
-            font-size: 0.82rem; padding: 8px 12px; border-radius: 6px; display: none;
-        }
-        #status-msg.ok  { background: rgba(80,200,100,0.1); color: #6ddf8a; border: 1px solid rgba(80,200,100,0.25); }
-        #status-msg.err { background: rgba(229,9,20,0.1);  color: #ff7070; border: 1px solid rgba(229,9,20,0.3); }
+        .col-right{display:flex;justify-content:flex-end}
 
-        /* ── TABLE ── */
-        .table-wrap {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 12px; overflow: hidden;
+        .logo{
+            text-decoration:none;
+            color:var(--red);
+            font-family:'Bebas Neue',sans-serif;
+            font-size:3rem;
+            letter-spacing:.16em;
+            text-shadow:0 0 24px rgba(229,9,20,.4);
         }
-        .table-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 20px; border-bottom: 1px solid var(--border);
-        }
-        .table-count { font-size: 0.78rem; color: var(--muted); }
 
-        #search-admin {
-            padding: 7px 12px; border-radius: 6px;
-            border: 1px solid var(--border2); background: var(--surface2);
-            color: white; font-family: var(--font-body); font-size: 0.82rem; outline: none; width: 200px;
+        .btn-nav{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            text-decoration:none;
+            color:#fff;
+            border:1px solid rgba(255,255,255,.28);
+            border-radius:999px;
+            padding:9px 13px;
+            font-size:.82rem;
+            font-weight:600;
+            background:rgba(0,0,0,.3);
+            backdrop-filter:blur(6px);
+            transition:.2s;
         }
-        #search-admin:focus { border-color: rgba(229,9,20,0.4); }
+        .btn-nav:hover{background:rgba(255,255,255,.1)}
+        .btn-logout{cursor:pointer;border-color:rgba(255,255,255,.36)}
 
-        .tabla-admin {
-            width: 100%; border-collapse: collapse;
-            font-size: 0.82rem;
+        .admin-layout{
+            width:min(1260px,94%);
+            margin:0 auto;
+            padding:8px 0 32px;
+            animation:fadeUp .4s ease both;
+            display:grid;
+            gap:14px;
         }
-        .tabla-admin th {
-            padding: 11px 14px; text-align: left; font-size: 0.68rem;
-            letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
-            border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02);
-        }
-        .tabla-admin td {
-            padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,0.04);
-            color: #ddd;
-        }
-        .tabla-admin tr:last-child td { border-bottom: none; }
-        .tabla-admin tr:hover td { background: rgba(255,255,255,0.02); }
 
-        .source-badge {
-            display: inline-block; font-size: 0.62rem; font-weight: 700;
-            padding: 2px 7px; border-radius: 4px; letter-spacing: 0.06em; text-transform: uppercase;
+        .hero{
+            border:1px solid var(--line);
+            border-radius:16px;
+            padding:20px 18px;
+            background:linear-gradient(160deg, rgba(20,20,20,.84), rgba(9,9,9,.88));
+            box-shadow:0 18px 46px rgba(0,0,0,.46);
         }
-        .source-badge.yt    { background: rgba(229,9,20,0.2);  color: #ff6060; border: 1px solid rgba(229,9,20,0.3); }
-        .source-badge.drive { background: rgba(77,171,247,0.15); color: #74b7f5; border: 1px solid rgba(77,171,247,0.3); }
 
-        .row-actions { display: flex; gap: 6px; }
-        .btn-edit-row, .btn-del-row {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 5px 10px; border-radius: 5px; cursor: pointer;
-            font-family: var(--font-body); font-size: 0.72rem; font-weight: 600;
-            border: 1px solid; transition: filter 0.15s;
+        .hero h1{
+            font-family:'Bebas Neue',sans-serif;
+            letter-spacing:.08em;
+            font-size:2.2rem;
+            color:#fff;
+            margin-bottom:6px;
         }
-        .btn-edit-row:hover, .btn-del-row:hover { filter: brightness(1.15); }
-        .btn-edit-row { background: rgba(77,171,247,0.12); color: #74b7f5; border-color: rgba(77,171,247,0.25); }
-        .btn-del-row  { background: rgba(229,9,20,0.1);   color: #ff7070; border-color: rgba(229,9,20,0.25); }
-        .btn-edit-row svg, .btn-del-row svg { width: 11px; height: 11px; }
 
-        .empty-row td { text-align: center; padding: 40px !important; color: var(--muted2); }
+        .hero p{color:#cfcfcf;font-size:.95rem}
 
-        @media (max-width: 700px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .form-grid .full { grid-column: 1; }
-            .tabla-admin th:nth-child(3),
-            .tabla-admin td:nth-child(3) { display: none; }
+        .stats-grid{
+            display:grid;
+            grid-template-columns:repeat(4,minmax(150px,1fr));
+            gap:10px;
+            margin-top:14px;
         }
+
+        .stat{
+            border:1px solid var(--line);
+            border-radius:12px;
+            background:rgba(255,255,255,.03);
+            padding:10px 12px;
+        }
+
+        .stat-label{
+            color:#9f9f9f;
+            font-size:.72rem;
+            text-transform:uppercase;
+            letter-spacing:.08em;
+        }
+
+        .stat-value{
+            margin-top:4px;
+            font-size:1.25rem;
+            font-weight:800;
+        }
+
+        .form-card,
+        .table-wrap{
+            border:1px solid var(--line);
+            border-radius:14px;
+            background:var(--surface);
+            backdrop-filter:blur(6px);
+            overflow:hidden;
+        }
+
+        .card-head{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:10px;
+            padding:14px 14px;
+            border-bottom:1px solid var(--line);
+            background:rgba(255,255,255,.02);
+        }
+
+        .card-title{
+            font-size:.76rem;
+            letter-spacing:.12em;
+            text-transform:uppercase;
+            color:#c9c9c9;
+            font-weight:700;
+        }
+
+        .card-body{padding:14px}
+
+        .form-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+        }
+
+        .field{display:flex;flex-direction:column;gap:5px}
+
+        .field label{
+            font-size:.72rem;
+            font-weight:600;
+            letter-spacing:.08em;
+            text-transform:uppercase;
+            color:#a8a8a8;
+        }
+
+        .field input,
+        .field select{
+            height:42px;
+            border-radius:9px;
+            border:1px solid rgba(255,255,255,.13);
+            background:var(--surface-2);
+            color:#fff;
+            padding:0 12px;
+            font-size:.9rem;
+            outline:none;
+            transition:border-color .2s, box-shadow .2s;
+        }
+
+        .field input:focus,
+        .field select:focus{
+            border-color:rgba(229,9,20,.65);
+            box-shadow:0 0 0 3px rgba(229,9,20,.12);
+        }
+
+        .field.full{grid-column:1/-1}
+
+        .form-actions{
+            display:flex;
+            gap:8px;
+            flex-wrap:wrap;
+            align-items:center;
+            margin-top:14px;
+        }
+
+        .btn-save,
+        .btn-cancel,
+        .btn-ghost,
+        .btn-filter{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            height:38px;
+            border-radius:9px;
+            padding:0 13px;
+            font-size:.8rem;
+            font-weight:700;
+            letter-spacing:.05em;
+            text-transform:uppercase;
+            cursor:pointer;
+            border:1px solid transparent;
+            transition:.18s;
+        }
+
+        .btn-save{
+            background:linear-gradient(180deg,var(--red-2),var(--red));
+            border:none;
+            color:#fff;
+            box-shadow:0 12px 28px rgba(229,9,20,.3);
+        }
+        .btn-save:hover{filter:brightness(1.08)}
+
+        .btn-cancel{
+            display:none;
+            color:#d2d2d2;
+            background:transparent;
+            border-color:rgba(255,255,255,.18);
+        }
+        .btn-cancel:hover{border-color:rgba(255,255,255,.32);color:#fff}
+
+        .btn-ghost,
+        .btn-filter{
+            color:#d8d8d8;
+            background:rgba(255,255,255,.03);
+            border-color:rgba(255,255,255,.14);
+        }
+        .btn-ghost:hover,
+        .btn-filter:hover{border-color:rgba(255,255,255,.28);color:#fff}
+
+        #status-msg{
+            display:none;
+            padding:7px 10px;
+            border-radius:8px;
+            font-size:.8rem;
+        }
+
+        #status-msg.ok{background:rgba(80,200,100,.12);border:1px solid rgba(80,200,100,.28);color:var(--ok)}
+        #status-msg.err{background:rgba(229,9,20,.12);border:1px solid rgba(229,9,20,.34);color:#ff7c7c}
+
+        .table-toolbar{
+            display:grid;
+            grid-template-columns:1.2fr repeat(3,minmax(120px,.35fr)) auto;
+            gap:8px;
+            padding:12px 14px;
+            border-bottom:1px solid var(--line);
+            background:rgba(255,255,255,.015);
+        }
+
+        .table-toolbar input,
+        .table-toolbar select{
+            height:36px;
+            border-radius:8px;
+            border:1px solid rgba(255,255,255,.14);
+            background:var(--surface-2);
+            color:#fff;
+            padding:0 10px;
+            outline:none;
+            font-size:.82rem;
+        }
+
+        .table-toolbar input:focus,
+        .table-toolbar select:focus{border-color:rgba(229,9,20,.5)}
+
+        .table-count{
+            color:#aaaaaa;
+            font-size:.78rem;
+            padding:10px 14px 0;
+        }
+
+        .table-scroll{overflow:auto;max-height:60vh}
+
+        .tabla-admin{width:100%;border-collapse:collapse;font-size:.82rem;min-width:980px}
+
+        .tabla-admin th{
+            position:sticky;
+            top:0;
+            z-index:1;
+            text-align:left;
+            padding:10px 12px;
+            font-size:.68rem;
+            letter-spacing:.1em;
+            text-transform:uppercase;
+            color:#b1b1b1;
+            background:#161616;
+            border-bottom:1px solid var(--line);
+        }
+
+        .tabla-admin td{
+            padding:10px 12px;
+            border-bottom:1px solid rgba(255,255,255,.05);
+            color:#e4e4e4;
+            vertical-align:middle;
+        }
+
+        .tabla-admin tr:hover td{background:rgba(255,255,255,.025)}
+        .empty-row td{text-align:center;padding:34px 10px!important;color:#9a9a9a}
+
+        .source-badge,
+        .cat-badge{
+            display:inline-flex;
+            align-items:center;
+            border-radius:999px;
+            padding:2px 8px;
+            font-size:.65rem;
+            text-transform:uppercase;
+            letter-spacing:.07em;
+            font-weight:700;
+            border:1px solid;
+        }
+
+        .source-badge.yt{background:rgba(229,9,20,.18);color:#ff6f6f;border-color:rgba(229,9,20,.34)}
+        .source-badge.drive{background:rgba(77,171,247,.16);color:#8ec8ff;border-color:rgba(77,171,247,.32)}
+
+        .cat-badge{background:rgba(255,255,255,.06);color:#d6d6d6;border-color:rgba(255,255,255,.2)}
+
+        .row-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+        .btn-edit-row,
+        .btn-del-row,
+        .btn-copy-row,
+        .btn-dup-row{
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+            height:30px;
+            border-radius:7px;
+            padding:0 8px;
+            font-size:.7rem;
+            font-weight:700;
+            border:1px solid;
+            cursor:pointer;
+        }
+
+        .btn-edit-row{background:rgba(77,171,247,.14);color:#8ec8ff;border-color:rgba(77,171,247,.3)}
+        .btn-del-row{background:rgba(229,9,20,.12);color:#ff7a7a;border-color:rgba(229,9,20,.28)}
+        .btn-copy-row{background:rgba(255,255,255,.06);color:#ddd;border-color:rgba(255,255,255,.18)}
+        .btn-dup-row{background:rgba(255,191,77,.14);color:#ffc96d;border-color:rgba(255,191,77,.34)}
+
+        .btn-edit-row:hover,
+        .btn-del-row:hover,
+        .btn-copy-row:hover,
+        .btn-dup-row:hover{filter:brightness(1.15)}
+
+        .table-foot{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:10px;
+            padding:10px 14px;
+            border-top:1px solid var(--line);
+            color:#9f9f9f;
+            font-size:.76rem;
+            background:rgba(255,255,255,.015);
+        }
+
+        @media (max-width: 980px){
+            .stats-grid{grid-template-columns:repeat(2,minmax(130px,1fr))}
+            .table-toolbar{grid-template-columns:1fr 1fr;}
+        }
+
+        @media (max-width: 700px){
+            .header-inner{grid-template-columns:auto 1fr auto}
+            .logo{font-size:2.2rem}
+            .form-grid{grid-template-columns:1fr}
+            .field.full{grid-column:1}
+            .table-toolbar{grid-template-columns:1fr}
+        }
+
+        @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes slowZoom{from{transform:scale(1.05)}to{transform:scale(1.1)}}
     </style>
 </head>
 <body>
 
-    <!-- ══ HEADER ══ -->
     <header class="site-header">
         <div class="header-inner">
             <div class="col-left">
@@ -169,59 +445,97 @@
     </header>
 
     <div class="admin-layout" id="admin-layout">
+        <section class="hero">
+            <h1>Panel administrativo</h1>
+            <p>Gestiona temas, organiza catálogo y aplica cambios en tiempo real con herramientas rápidas.</p>
+            <div class="stats-grid">
+                <div class="stat"><div class="stat-label">Total temas</div><div class="stat-value" id="stat-total">0</div></div>
+                <div class="stat"><div class="stat-label">YouTube</div><div class="stat-value" id="stat-yt">0</div></div>
+                <div class="stat"><div class="stat-label">Drive</div><div class="stat-value" id="stat-drive">0</div></div>
+                <div class="stat"><div class="stat-label">Categorías</div><div class="stat-value" id="stat-cats">0</div></div>
+            </div>
+        </section>
 
-        <!-- FORM -->
-        <div class="form-card">
-            <p class="form-title" id="form-label">➕ Añadir nuevo tema</p>
-            <input type="hidden" id="edit-id">
+        <section class="form-card">
+            <div class="card-head">
+                <p class="card-title" id="form-label">➕ Añadir nuevo tema</p>
+                <button type="button" id="btnAutoId" class="btn-ghost">Extraer ID de URL</button>
+            </div>
+            <div class="card-body">
+                <input type="hidden" id="edit-id">
 
-            <div class="form-grid">
-                <div class="field"><label>Título</label><input type="text" id="titulo" placeholder="Nombre del tema"></div>
-                <div class="field"><label>Artista</label><input type="text" id="artista" placeholder="Banda o artista"></div>
-                <div class="field"><label>Tonalidad</label><input type="text" id="tonalidad" placeholder="ej: La menor"></div>
-                <div class="field"><label>Segundo de inicio</label><input type="number" id="inicio" placeholder="0" min="0"></div>
-                <div class="field full"><label>ID del Video</label><input type="text" id="videoId" placeholder="ID de YouTube o Google Drive"></div>
-                <div class="field">
-                    <label>Categoría</label>
-                    <select id="categoria">
-                        <option value="huayno">Huayno</option>
-                        <option value="salay">Salay</option>
-                        <option value="cumbia">Cumbia</option>
-                    </select>
+                <div class="form-grid">
+                    <div class="field"><label>Título</label><input type="text" id="titulo" placeholder="Nombre del tema"></div>
+                    <div class="field"><label>Artista</label><input type="text" id="artista" placeholder="Banda o artista"></div>
+                    <div class="field"><label>Tonalidad</label><input type="text" id="tonalidad" placeholder="ej: La menor"></div>
+                    <div class="field"><label>Segundo de inicio</label><input type="number" id="inicio" placeholder="0" min="0"></div>
+                    <div class="field full"><label>ID o URL del video</label><input type="text" id="videoId" placeholder="ID de YouTube o Google Drive (o pega URL)"></div>
+                    <div class="field">
+                        <label>Categoría</label>
+                        <select id="categoria">
+                            <option value="huayno">Huayno</option>
+                            <option value="salay">Salay</option>
+                            <option value="cumbia">Cumbia</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Fuente</label>
+                        <select id="fuente">
+                            <option value="youtube">YouTube</option>
+                            <option value="drive">Google Drive</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="field">
-                    <label>Fuente</label>
-                    <select id="fuente">
-                        <option value="youtube">YouTube</option>
-                        <option value="drive">Google Drive</option>
-                    </select>
+
+                <div class="form-actions">
+                    <button id="btnGuardar" class="btn-save">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Guardar tema
+                    </button>
+                    <button id="btnCancelar" class="btn-cancel" type="button">Cancelar</button>
+                    <span id="status-msg"></span>
                 </div>
             </div>
+        </section>
 
-            <div class="form-actions">
-                <button id="btnGuardar" class="btn-save">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                    Guardar tema
-                </button>
-                <button id="btnCancelar" class="btn-cancel">Cancelar</button>
-                <span id="status-msg"></span>
+        <section class="table-wrap">
+            <div class="card-head">
+                <p class="card-title">Repertorio</p>
+                <button id="btnExportCsv" class="btn-ghost" type="button">Exportar CSV</button>
             </div>
-        </div>
 
-        <!-- TABLE -->
-        <div class="section-label"><span>Repertorio</span></div>
-        <div class="table-wrap">
-            <div class="table-header">
-                <span class="table-count" id="table-count">Cargando...</span>
-                <input type="text" id="search-admin" placeholder="🔎 Filtrar...">
+            <div class="table-toolbar">
+                <input type="text" id="search-admin" placeholder="🔎 Buscar título, artista o tonalidad...">
+                <select id="filter-categoria">
+                    <option value="all">Todas las categorías</option>
+                    <option value="huayno">Huayno</option>
+                    <option value="salay">Salay</option>
+                    <option value="cumbia">Cumbia</option>
+                </select>
+                <select id="filter-fuente">
+                    <option value="all">Todas las fuentes</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="drive">Google Drive</option>
+                </select>
+                <select id="sort-admin">
+                    <option value="titulo-asc">Título A-Z</option>
+                    <option value="titulo-desc">Título Z-A</option>
+                    <option value="artista-asc">Artista A-Z</option>
+                    <option value="reciente">Más recientes</option>
+                </select>
+                <button id="btnResetFilters" class="btn-filter" type="button">Limpiar</button>
             </div>
-            <div style="overflow-x:auto;">
+
+            <p class="table-count" id="table-count">Cargando...</p>
+
+            <div class="table-scroll">
                 <table class="tabla-admin">
                     <thead>
                         <tr>
                             <th>Título</th>
                             <th>Artista</th>
                             <th>Tonalidad</th>
+                            <th>Categoría</th>
                             <th>Fuente</th>
                             <th>Acciones</th>
                         </tr>
@@ -229,27 +543,393 @@
                     <tbody id="tabla-body"></tbody>
                 </table>
             </div>
-        </div>
 
+            <div class="table-foot">
+                <span id="table-foot-msg">Atajos: Enter guarda · Esc cancela edición</span>
+                <span id="table-last-update">—</span>
+            </div>
+        </section>
     </div>
 
     <script type="module">
         import { db, auth } from "./firebase.js";
-        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc }
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, serverTimestamp }
             from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { globalLogout } from "./js/seguridad.js";
 
         const ADMIN_EMAIL = "admin@ripper.com";
+
+        const refs = {
+            editId: document.getElementById("edit-id"),
+            titulo: document.getElementById("titulo"),
+            artista: document.getElementById("artista"),
+            tonalidad: document.getElementById("tonalidad"),
+            videoId: document.getElementById("videoId"),
+            inicio: document.getElementById("inicio"),
+            categoria: document.getElementById("categoria"),
+            fuente: document.getElementById("fuente"),
+            formLabel: document.getElementById("form-label"),
+            btnGuardar: document.getElementById("btnGuardar"),
+            btnCancelar: document.getElementById("btnCancelar"),
+            status: document.getElementById("status-msg"),
+            tbody: document.getElementById("tabla-body"),
+            tableCount: document.getElementById("table-count"),
+            search: document.getElementById("search-admin"),
+            filterCategoria: document.getElementById("filter-categoria"),
+            filterFuente: document.getElementById("filter-fuente"),
+            sort: document.getElementById("sort-admin"),
+            statTotal: document.getElementById("stat-total"),
+            statYt: document.getElementById("stat-yt"),
+            statDrive: document.getElementById("stat-drive"),
+            statCats: document.getElementById("stat-cats"),
+            lastUpdate: document.getElementById("table-last-update")
+        };
+
+        let allTemas = [];
+        let filteredTemas = [];
+
         function normalizar(texto) {
-            return texto.toString().toLowerCase()
-                .normalize("NFD") // Descompone caracteres (ej: á -> a + ´)
-                .replace(/[\u0300-\u036f]/g, ""); // Elimina los acentos
+            return (texto || "").toString().toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
         }
 
-        let allTemas = []; // Cache local
+        function fmtNow() {
+            return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        }
 
-        // ── Auth guard ──
+        function showStatus(msg, ok) {
+            refs.status.textContent = msg;
+            refs.status.className = ok ? "ok" : "err";
+            refs.status.style.display = "inline-block";
+            setTimeout(() => { refs.status.style.display = "none"; }, 3200);
+        }
+
+        function collectData() {
+            return {
+                titulo: refs.titulo.value.trim(),
+                artista: refs.artista.value.trim(),
+                tonalidad: refs.tonalidad.value.trim(),
+                videoId: refs.videoId.value.trim(),
+                inicio: parseInt(refs.inicio.value, 10) || 0,
+                categoria: refs.categoria.value,
+                fuente: refs.fuente.value
+            };
+        }
+
+        function validateData(data) {
+            if (!data.titulo) return "El título es obligatorio.";
+            if (!data.videoId) return "El ID/URL del video es obligatorio.";
+            if (data.inicio < 0) return "El segundo de inicio no puede ser negativo.";
+            return "";
+        }
+
+        function applyFiltersAndRender() {
+            const q = normalizar(refs.search.value);
+            const cat = refs.filterCategoria.value;
+            const src = refs.filterFuente.value;
+            const sortMode = refs.sort.value;
+
+            filteredTemas = allTemas.filter(t => {
+                const matchesText = normalizar(t.titulo).includes(q)
+                    || normalizar(t.artista).includes(q)
+                    || normalizar(t.tonalidad).includes(q);
+                const matchesCat = cat === "all" || (t.categoria || "") === cat;
+                const matchesSrc = src === "all" || (t.fuente || "") === src;
+                return matchesText && matchesCat && matchesSrc;
+            });
+
+            filteredTemas.sort((a, b) => {
+                const ta = (a.titulo || "").toLowerCase();
+                const tb = (b.titulo || "").toLowerCase();
+                const aa = (a.artista || "").toLowerCase();
+                const ab = (b.artista || "").toLowerCase();
+
+                if (sortMode === "titulo-asc") return ta.localeCompare(tb);
+                if (sortMode === "titulo-desc") return tb.localeCompare(ta);
+                if (sortMode === "artista-asc") return aa.localeCompare(ab);
+                return (b.createdAtMs || 0) - (a.createdAtMs || 0);
+            });
+
+            renderTabla(filteredTemas);
+        }
+
+        function updateStats() {
+            refs.statTotal.textContent = allTemas.length;
+            refs.statYt.textContent = allTemas.filter(t => t.fuente === "youtube").length;
+            refs.statDrive.textContent = allTemas.filter(t => t.fuente === "drive").length;
+            refs.statCats.textContent = new Set(allTemas.map(t => t.categoria || "sin")).size;
+        }
+
+        function renderTabla(lista) {
+            refs.tableCount.textContent = `${lista.length} tema${lista.length !== 1 ? "s" : ""}`;
+            if (!lista.length) {
+                refs.tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Sin resultados</td></tr>`;
+                refs.lastUpdate.textContent = `Actualizado ${fmtNow()}`;
+                return;
+            }
+
+            refs.tbody.innerHTML = lista.map(t => `
+                <tr>
+                    <td>${t.titulo || "—"}</td>
+                    <td>${t.artista || "—"}</td>
+                    <td>${t.tonalidad || "—"}</td>
+                    <td><span class="cat-badge">${t.categoria || "—"}</span></td>
+                    <td><span class="source-badge ${t.fuente === "youtube" ? "yt" : "drive"}">${t.fuente || "—"}</span></td>
+                    <td>
+                        <div class="row-actions">
+                            <button class="btn-edit-row" onclick="prepEdit('${t._id}')">Editar</button>
+                            <button class="btn-dup-row" onclick="duplicar('${t._id}')">Duplicar</button>
+                            <button class="btn-copy-row" onclick="copiarLink('${t._id}','${t.categoria || "huayno"}')">Link</button>
+                            <button class="btn-del-row" onclick="borrar('${t._id}')">Eliminar</button>
+                        </div>
+                    </td>
+                </tr>`).join("");
+
+            refs.lastUpdate.textContent = `Actualizado ${fmtNow()}`;
+        }
+
+        async function cargarTemas() {
+            try {
+                const snap = await getDocs(collection(db, "temas"));
+                allTemas = snap.docs.map(d => {
+                    const data = d.data();
+                    return {
+                        _id: d.id,
+                        ...data,
+                        createdAtMs: data.createdAt?.toMillis ? data.createdAt.toMillis() : 0
+                    };
+                });
+                updateStats();
+                applyFiltersAndRender();
+            } catch (e) {
+                console.error(e);
+                showStatus("Error cargando temas.", false);
+            }
+        }
+
+        function limpiar() {
+            ["titulo", "artista", "tonalidad", "videoId", "inicio", "edit-id"].forEach(id => {
+                document.getElementById(id).value = "";
+            });
+            refs.categoria.value = "huayno";
+            refs.fuente.value = "youtube";
+            refs.formLabel.textContent = "➕ Añadir nuevo tema";
+            refs.btnGuardar.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Guardar tema`;
+            refs.btnCancelar.style.display = "none";
+        }
+
+        function extractVideoId(raw, fuente) {
+            const value = (raw || "").trim();
+            if (!value) return "";
+            if (!value.includes("http")) return value;
+
+            try {
+                const url = new URL(value);
+                if (fuente === "youtube") {
+                    if (url.hostname.includes("youtu.be")) return url.pathname.replace("/", "");
+                    const v = url.searchParams.get("v");
+                    if (v) return v;
+                    const segments = url.pathname.split("/").filter(Boolean);
+                    return segments[segments.length - 1] || value;
+                }
+                if (fuente === "drive") {
+                    const match = value.match(/\/d\/([^/]+)/);
+                    if (match && match[1]) return match[1];
+                    const idParam = url.searchParams.get("id");
+                    if (idParam) return idParam;
+                }
+            } catch {}
+            return value;
+        }
+
+        async function guardarTema() {
+            const editId = refs.editId.value;
+            const data = collectData();
+            data.videoId = extractVideoId(data.videoId, data.fuente);
+
+            const err = validateData(data);
+            if (err) {
+                showStatus(err, false);
+                return;
+            }
+
+            refs.btnGuardar.disabled = true;
+            refs.btnGuardar.textContent = editId ? "Actualizando..." : "Guardando...";
+
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, "temas", editId), data);
+                    const idx = allTemas.findIndex(t => t._id === editId);
+                    if (idx > -1) allTemas[idx] = { ...allTemas[idx], ...data };
+                    showStatus("✓ Tema actualizado.", true);
+                } else {
+                    const payload = { ...data, createdAt: serverTimestamp() };
+                    const ref = await addDoc(collection(db, "temas"), payload);
+                    allTemas.push({ _id: ref.id, ...data, createdAtMs: Date.now() });
+                    showStatus("✓ Tema añadido.", true);
+                }
+
+                limpiar();
+                updateStats();
+                applyFiltersAndRender();
+            } catch (e) {
+                console.error(e);
+                showStatus("Error: " + e.message, false);
+            } finally {
+                refs.btnGuardar.disabled = false;
+                if (refs.editId.value) {
+                    refs.btnGuardar.textContent = "Actualizar cambios";
+                } else {
+                    refs.btnGuardar.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Guardar tema`;
+                }
+            }
+        }
+
+        window.prepEdit = (id) => {
+            const t = allTemas.find(x => x._id === id);
+            if (!t) return;
+
+            refs.editId.value = id;
+            refs.titulo.value = t.titulo || "";
+            refs.artista.value = t.artista || "";
+            refs.tonalidad.value = t.tonalidad || "";
+            refs.videoId.value = t.videoId || "";
+            refs.inicio.value = t.inicio || 0;
+            refs.categoria.value = t.categoria || "huayno";
+            refs.fuente.value = t.fuente || "youtube";
+
+            refs.formLabel.textContent = "✏️ Editando tema";
+            refs.btnGuardar.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M20 6 9 17l-5-5"/></svg>
+                Actualizar cambios`;
+            refs.btnCancelar.style.display = "inline-flex";
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        };
+
+        window.duplicar = async (id) => {
+            const t = allTemas.find(x => x._id === id);
+            if (!t) return;
+            const copia = {
+                titulo: `${t.titulo || "Tema"} (copia)`,
+                artista: t.artista || "",
+                tonalidad: t.tonalidad || "",
+                videoId: t.videoId || "",
+                inicio: t.inicio || 0,
+                categoria: t.categoria || "huayno",
+                fuente: t.fuente || "youtube",
+                createdAt: serverTimestamp()
+            };
+
+            try {
+                const ref = await addDoc(collection(db, "temas"), copia);
+                allTemas.unshift({ _id: ref.id, ...copia, createdAtMs: Date.now() });
+                updateStats();
+                applyFiltersAndRender();
+                showStatus("✓ Tema duplicado.", true);
+            } catch (e) {
+                showStatus("Error al duplicar: " + e.message, false);
+            }
+        };
+
+        window.copiarLink = async (id, cat) => {
+            const url = `${location.origin}${location.pathname.replace("admin.html", "reproductor.html")}?id=${id}&cat=${cat || "huayno"}`;
+            try {
+                await navigator.clipboard.writeText(url);
+                showStatus("✓ Link copiado.", true);
+            } catch {
+                showStatus("No se pudo copiar el link.", false);
+            }
+        };
+
+        window.borrar = async (id) => {
+            const t = allTemas.find(x => x._id === id);
+            if (!confirm(`¿Eliminar "${t?.titulo || "tema"}"?`)) return;
+            try {
+                await deleteDoc(doc(db, "temas", id));
+                allTemas = allTemas.filter(x => x._id !== id);
+                updateStats();
+                applyFiltersAndRender();
+                showStatus("✓ Eliminado.", true);
+            } catch (e) {
+                showStatus("Error al eliminar: " + e.message, false);
+            }
+        };
+
+        function exportCsv() {
+            const rows = filteredTemas.length ? filteredTemas : allTemas;
+            if (!rows.length) {
+                showStatus("No hay datos para exportar.", false);
+                return;
+            }
+
+            const headers = ["titulo", "artista", "tonalidad", "categoria", "fuente", "videoId", "inicio"];
+            const escapeCell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+            const csv = [headers.join(",")]
+                .concat(rows.map(r => headers.map(h => escapeCell(r[h])).join(",")))
+                .join("\n");
+
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `ripper-temas-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showStatus("✓ CSV exportado.", true);
+        }
+
+        document.getElementById("btnLogOut").onclick = () => globalLogout(auth);
+        refs.btnGuardar.onclick = guardarTema;
+        refs.btnCancelar.onclick = limpiar;
+        document.getElementById("btnExportCsv").onclick = exportCsv;
+
+        [refs.search, refs.filterCategoria, refs.filterFuente, refs.sort].forEach(el => {
+            el.addEventListener("input", applyFiltersAndRender);
+            el.addEventListener("change", applyFiltersAndRender);
+        });
+
+        document.getElementById("btnResetFilters").onclick = () => {
+            refs.search.value = "";
+            refs.filterCategoria.value = "all";
+            refs.filterFuente.value = "all";
+            refs.sort.value = "titulo-asc";
+            applyFiltersAndRender();
+        };
+
+        document.getElementById("btnAutoId").onclick = () => {
+            if (!refs.videoId.value.trim()) {
+                showStatus("Pega primero un ID o URL en el campo de video.", false);
+                return;
+            }
+            refs.videoId.value = extractVideoId(refs.videoId.value, refs.fuente.value);
+            showStatus("✓ ID extraído.", true);
+        };
+
+        refs.videoId.addEventListener("blur", () => {
+            if (!refs.videoId.value.trim()) return;
+            refs.videoId.value = extractVideoId(refs.videoId.value, refs.fuente.value);
+        });
+
+        document.addEventListener("keydown", (e) => {
+            const activeTag = (document.activeElement?.tagName || "").toLowerCase();
+            if (e.key === "Escape") {
+                limpiar();
+            }
+            if (e.key === "Enter" && activeTag !== "textarea" && activeTag !== "button") {
+                const isFormField = ["input", "select"].includes(activeTag);
+                if (isFormField) {
+                    e.preventDefault();
+                    guardarTema();
+                }
+            }
+        });
+
         onAuthStateChanged(auth, user => {
             if (user && user.email === ADMIN_EMAIL) {
                 cargarTemas();
@@ -258,155 +938,6 @@
                 window.location.href = "home.html";
             }
         });
-
-        document.getElementById("btnLogOut").onclick = () => globalLogout(auth);
-
-        // ── Cargar todos los temas ──
-        async function cargarTemas() {
-            const snap = await getDocs(collection(db, "temas"));
-            allTemas = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
-            renderTabla(allTemas);
-        }
-
-        // ── Render tabla (con filtro opcional) ──
-        function renderTabla(lista) {
-            const tbody = document.getElementById("tabla-body");
-            document.getElementById("table-count").textContent = `${lista.length} tema${lista.length !== 1 ? 's' : ''}`;
-
-            if (!lista.length) {
-                tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Sin resultados</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = lista.map(t => `
-                <tr>
-                    <td>${t.titulo || "—"}</td>
-                    <td>${t.artista || "—"}</td>
-                    <td>${t.tonalidad || "—"}</td>
-                    <td><span class="source-badge ${t.fuente === 'youtube' ? 'yt' : 'drive'}">${t.fuente}</span></td>
-                    <td>
-                        <div class="row-actions">
-                            <button class="btn-edit-row" onclick="prepEdit('${t._id}')">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
-                                Editar
-                            </button>
-                            <button class="btn-del-row" onclick="borrar('${t._id}')">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                                Eliminar
-                            </button>
-                        </div>
-                    </td>
-                </tr>`).join('');
-        }
-
-        // ── Filtro de búsqueda ──
-        document.getElementById("search-admin").addEventListener("input", e => {
-            const q = normalizar(e.target.value); // Normalizamos la búsqueda
-            
-            renderTabla(allTemas.filter(t =>
-                normalizar(t.titulo || "").includes(q) ||
-                normalizar(t.artista || "").includes(q) ||
-                normalizar(t.tonalidad || "").includes(q)
-            ));
-        });
-
-        // ── Guardar / actualizar ──
-        document.getElementById("btnGuardar").onclick = async () => {
-            const btn   = document.getElementById("btnGuardar");
-            const editId = document.getElementById("edit-id").value;
-            const data  = {
-                titulo:    document.getElementById("titulo").value.trim(),
-                artista:   document.getElementById("artista").value.trim(),
-                tonalidad: document.getElementById("tonalidad").value.trim(),
-                videoId:   document.getElementById("videoId").value.trim(),
-                inicio:    parseInt(document.getElementById("inicio").value) || 0,
-                categoria: document.getElementById("categoria").value,
-                fuente:    document.getElementById("fuente").value
-            };
-            if (!data.titulo) { showStatus("El título es obligatorio.", false); return; }
-
-            btn.textContent = editId ? "Actualizando..." : "Guardando...";
-            btn.disabled = true;
-
-            try {
-                if (editId) {
-                    await updateDoc(doc(db, "temas", editId), data);
-                    // Actualizar caché local
-                    const idx = allTemas.findIndex(t => t._id === editId);
-                    if (idx > -1) allTemas[idx] = { _id: editId, ...data };
-                    showStatus("✓ Tema actualizado.", true);
-                } else {
-                    const ref = await addDoc(collection(db, "temas"), data);
-                    allTemas.push({ _id: ref.id, ...data });
-                    showStatus("✓ Tema añadido.", true);
-                }
-                renderTabla(allTemas);
-                limpiar();
-            } catch (e) {
-                showStatus("Error: " + e.message, false);
-            } finally {
-                btn.disabled = false;
-            }
-        };
-
-        // ── Preparar edición ──
-        window.prepEdit = async (id) => {
-            const t = allTemas.find(x => x._id === id);
-            if (!t) return;
-
-            document.getElementById("edit-id").value        = id;
-            document.getElementById("titulo").value         = t.titulo    || "";
-            document.getElementById("artista").value        = t.artista   || "";
-            document.getElementById("tonalidad").value      = t.tonalidad || "";
-            document.getElementById("videoId").value        = t.videoId   || "";
-            document.getElementById("inicio").value         = t.inicio    || 0;
-            document.getElementById("categoria").value      = t.categoria || "huayno";
-            document.getElementById("fuente").value         = t.fuente    || "youtube";
-
-            document.getElementById("form-label").textContent = "✏️ Editando tema";
-            document.getElementById("btnGuardar").innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M20 6 9 17l-5-5"/></svg>
-                Actualizar cambios`;
-            document.getElementById("btnCancelar").style.display = "inline-flex";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        // ── Eliminar ──
-        window.borrar = async (id) => {
-            const t = allTemas.find(x => x._id === id);
-            if (!confirm(`¿Eliminar "${t?.titulo}"?`)) return;
-            try {
-                await deleteDoc(doc(db, "temas", id));
-                allTemas = allTemas.filter(x => x._id !== id);
-                renderTabla(allTemas);
-                showStatus("✓ Eliminado.", true);
-            } catch (e) {
-                showStatus("Error al eliminar: " + e.message, false);
-            }
-        };
-
-        // ── Helpers ──
-        function limpiar() {
-            ["titulo","artista","tonalidad","videoId","inicio","edit-id"].forEach(id => {
-                document.getElementById(id).value = "";
-            });
-            document.getElementById("categoria").value = "huayno";
-            document.getElementById("fuente").value    = "youtube";
-            document.getElementById("form-label").textContent = "➕ Añadir nuevo tema";
-            document.getElementById("btnGuardar").innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                Guardar tema`;
-            document.getElementById("btnCancelar").style.display = "none";
-        }
-
-        document.getElementById("btnCancelar").onclick = limpiar;
-
-        function showStatus(msg, ok) {
-            const el = document.getElementById("status-msg");
-            el.textContent = msg;
-            el.className   = ok ? "ok" : "err";
-            el.style.display = "inline-block";
-            setTimeout(() => { el.style.display = "none"; }, 3500);
-        }
     </script>
 </body>
 </html>
